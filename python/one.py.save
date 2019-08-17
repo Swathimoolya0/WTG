@@ -1,0 +1,76 @@
+from dronekit import connect, VehicleMode, LocationGlobal, LocationGlobalRelative
+from pymavlink import mavutil # Needed for command message definitions
+import math
+import RPi.GPIO as GPIO
+import time
+import dronekit
+
+connection_string = "/dev/ttyACM0,115200"
+print("Connecting to...% s" % connection_string)
+vehicle = connect(connection_string, wait_ready=True)
+
+print(vehicle.mode)
+
+
+print " Type: %s" % vehicle._vehicle_type
+print " Armed: %s" % vehicle.armed
+print " System status: %s" % vehicle.system_status.state
+print " GPS: %s" % vehicle.gps_0
+print " Alt: %s" % vehicle.location.global_relative_frame.alt
+
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
+TFRONT = 16
+EFRONT = 18
+TRIGHT = 19 
+ERIGHT = 21
+TBACK  = 11
+EBACK  = 12
+TLEFT  = 7
+ELEFT  = 8
+
+GPIO.setup(TFRONT,GPIO.OUT)
+GPIO.setup(EFRONT,GPIO.IN)
+GPIO.setup(TRIGHT,GPIO.OUT)
+GPIO.setup(ERIGHT,GPIO.IN)
+GPIO.setup(TBACK,GPIO.OUT)
+GPIO.setup(EBACK,GPIO.IN)
+GPIO.setup(TLEFT,GPIO.OUT)
+GPIO.setup(ELEFT,GPIO.IN)
+
+while True:
+
+ GPIO.output(TFRONT, False)
+ time.sleep(1)
+
+ GPIO.output(TFRONT, True)
+ time.sleep(0.0001)
+ GPIO.output(TFRONT, False)
+
+ a = time.time()
+ b = time.time()
+
+ while GPIO.input(EFRONT)==0:
+  a = time.time()
+
+
+ while GPIO.input(EFRONT)==1:
+  b = time.time()
+
+ x = b-a
+
+ distance = x * 17150
+ distance = round(distance, 0)
+
+ if (distance >2 and distance <400):
+
+  # move back
+
+  wp = get_location_offset_meters(wp, -10, 0, 0);
+  cmd = Command(0,0,0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 1, 0, 0, 0, 0, wp.lat, wp.lon, wp.alt)
+  cmds.add(cmd)
+
+
+
+

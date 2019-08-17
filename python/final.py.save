@@ -1,0 +1,158 @@
+from dronekit import connect, VehicleMode, LocationGlobal, LocationGlobalRelative
+from pymavlink import mavutil # Needed for command message definitions
+import math
+import RPi.GPIO as GPIO
+import time
+import dronekit
+
+connection_string = "/dev/ttyACM0,115200"
+print("Connecting to...% s" % connection_string)
+vehicle = connect(connection_string, wait_ready=True)
+
+print(vehicle.mode)
+
+
+print " Type: %s" % vehicle._vehicle_type
+print " Armed: %s" % vehicle.armed
+print " System status: %s" % vehicle.system_status.state
+print " GPS: %s" % vehicle.gps_0
+print " Alt: %s" % vehicle.location.global_relative_frame.alt
+
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
+
+TFRONT = 11
+EFRONT = 12
+TRIGHT = 16
+ERIGHT = 18
+TBACK  = 19
+EBACK  = 21
+TLEFT  = 23
+ELEFT  = 24
+
+GPIO.setup(TFRONT,GPIO.OUT)
+GPIO.setup(EFRONT,GPIO.IN)
+GPIO.setup(TRIGHT,GPIO.OUT)
+GPIO.setup(ERIGHT,GPIO.IN)
+GPIO.setup(TBACK,GPIO.OUT)
+GPIO.setup(EBACK,GPIO.IN)
+GPIO.setup(TLEFT,GPIO.OUT)
+GPIO.setup(ELEFT,GPIO.IN)
+
+while True:
+
+ GPIO.output(TFRONT, False)
+ time.sleep(1)
+
+ GPIO.output(TFRONT, True)
+ time.sleep(0.0001)
+ GPIO.output(TFRONT, False)
+
+ a = time.time()
+ b = time.time()
+
+ while GPIO.input(EFRONT)==0:
+  a = time.time()
+
+
+ while GPIO.input(EFRONT)==1:
+  b = time.time()
+
+ x = b-a
+
+ d0 = x * 17150
+ d0 = round(d0, 0)
+ print d0
+
+  # move back
+  wp = get_location_offset_meters(wp, -1, 0, 0);
+  cmd = Command(0,0,0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 1, 0, 0, 0, 0, wp.lat, wp.lon, wp.alt)
+  cmds.add(cmd)
+
+
+ GPIO.output(TRIGHT, False)
+ time.sleep(1)
+
+ GPIO.output(TRIGHT, True)
+ time.sleep(0.0001)
+ GPIO.output(TRIGHT, False)
+
+ c = time.time()
+ d = time.time()
+
+ while GPIO.input(ERIGHT)==0:
+  c = time.time()
+
+ while GPIO.input(ERIGHT)==1:
+  d = time.time()
+
+ y = d-c
+
+ d1 = y * 17150
+ d1 = round(d1, 0)
+ print d1
+
+ if (d1 >2 and d1 <400):
+  # move left
+  wp = get_location_offset_meters(wp, 0, -1, 0);
+  cmd = Command(0,0,0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 1, 0, 0, 0, 0, wp.lat, wp.lon, wp.alt)
+  cmds.add(cmd)
+
+ GPIO.output(TBACK, False)
+ time.sleep(1)
+
+ GPIO.output(TBACK, True)
+ time.sleep(0.0001)
+ GPIO.output(TBACK, False)
+
+ e = time.time()
+ f = time.time()
+
+ while GPIO.input(EBACK)==0:
+  e = time.time()
+
+
+ while GPIO.input(EBACK)==1:
+  f = time.time()
+
+ z = f-e
+
+ d2 = z * 17150
+ d2 = round(d2, 0)
+ print d2
+
+ if (d2 >2 and distance <400):
+  # move front
+  wp = get_location_offset_meters(wp, 1, 0, 0);
+  cmd = Command(0,0,0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 1, 0, 0, 0, 0, wp.lat, wp.lon, wp.alt)
+  cmds.add(cmd)
+
+ GPIO.output(TLEFT, False)
+ time.sleep(1)
+
+ GPIO.output(TLEFT, True)
+ time.sleep(0.0001)
+ GPIO.output(TLEFT, False)
+
+ g = time.time()
+ h = time.time()
+
+ while GPIO.input(ELEFT)==0:
+  g = time.time()
+
+ while GPIO.input(ELEFT)==1:
+  h = time.time()
+
+ w = h-g
+ d3 = w * 17150
+ d3 = round(d3, 0)
+ print d3
+
+if (d3 >2 and d3 <400):
+ # move right
+ wp = get_location_offset_meters(wp, 0, 1, 0);
+ cmd = Command(0,0,0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 1, 0, 0, 0, 0, wp.lat, wp.lon, wp.alt)
+ cmds.add(cmd)
+
+GPIO.cleanup()
