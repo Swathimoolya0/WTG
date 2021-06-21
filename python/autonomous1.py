@@ -6,7 +6,6 @@ connection_string = "/dev/ttyACM0,115200"
 print("Connecting to...% s" % connection_string)
 vehicle = connect(connection_string, wait_ready=True)
 
-
 # Function to arm and then takeoff to a user specified altitude
 def arm_and_takeoff(aTargetAltitude):
 
@@ -39,7 +38,6 @@ def arm_and_takeoff(aTargetAltitude):
 
 # Initialize the takeoff sequence to 7m
 arm_and_takeoff(7)
-
 print("Take off complete")
 
 # Hover for 10 seconds
