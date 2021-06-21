@@ -3,13 +3,10 @@ from pymavlink import mavutil # Needed for command message definitions
 import math
 import RPi.GPIO as GPIO
 import time
-
 connection_string = "/dev/ttyACM0,115200"
 print("Connecting to...% s" % connection_string)
 vehicle = connect(connection_string, wait_ready=True)
-
 print(vehicle.mode)
-
 
 print " Type: %s" % vehicle._vehicle_type
 print " Armed: %s" % vehicle.armed
@@ -17,10 +14,8 @@ print " System status: %s" % vehicle.system_status.state
 print " GPS: %s" % vehicle.gps_0
 print " Alt: %s" % vehicle.location.global_relative_frame.alt
 
-
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
-
 TFRONT = 16
 EFRONT = 18
 TRIGHT = 11
@@ -29,7 +24,6 @@ TBACK  = 13
 EBACK  = 15
 TLEFT  = 19
 ELEFT  = 21
-
 GPIO.setup(TFRONT,GPIO.OUT)
 GPIO.setup(EFRONT,GPIO.IN)
 GPIO.setup(TRIGHT,GPIO.OUT)
@@ -53,7 +47,6 @@ while True:
 
  while GPIO.input(EFRONT)==0:
   a = time.time()
-
 
  while GPIO.input(EFRONT)==1:
   b = time.time()
@@ -164,5 +157,4 @@ while True:
  if (d3 >2 and d3 <400):
   # move right
   set_attitude(roll_angle = -4, duration = 3)
-
 GPIO.cleanup()
